@@ -34,3 +34,13 @@ class TestAPIService:
         data1 = json.loads(r1.text)
         data2 = json.loads(r2.text)
         assert data1["message_id"] != data2["message_id"]
+    
+    def test_message_posted_is_accessible(self):
+        message = 'test'
+        base_url = 'http://localhost:5000'
+        post_r = requests.post(base_url, data=message)
+        data = json.loads(post_r.text)
+        message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
+        get_message_r = requests.get(message_link)
+        assert get_message_r.status_code == 200
+        

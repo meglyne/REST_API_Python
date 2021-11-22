@@ -1,0 +1,6 @@
+# API and related packages
+flask
+
+# for testing purposes
+pytest
+requests

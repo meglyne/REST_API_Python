@@ -1,5 +1,8 @@
+import redis
 import requests
 import json
+
+import pytest
 
 class TestAPIService:
 
@@ -43,4 +46,14 @@ class TestAPIService:
         message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
         get_message_r = requests.get(message_link)
         assert get_message_r.status_code == 200
+
+class TestDatabaseService:
+
+    @pytest.fixture(scope="module")
+    def redis_connection(self):
+        return redis.Redis(host='localhost', port=6379, db=0)
+
+    def test_service_is_available(self, redis_connection):
+        assert redis_connection.ping() == True
+
         

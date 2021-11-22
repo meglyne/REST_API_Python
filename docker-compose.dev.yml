@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  redis-dev:
+    hostname: "redis-server-dev"
+    ports:
+      - "6379:6379"
+    image: "redis:alpine"
+  
+  flask_app-dev:
+    container_name: messaging_api-dev
+    build: 
+      context: .
+      dockerfile: Dockerfile-dev
+    ports:
+      - 5000:5000
+    volumes:
+      - ./:/usr/src/app

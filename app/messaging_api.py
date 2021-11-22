@@ -7,7 +7,7 @@ def create_app():
     @app.route("/", methods=['GET', 'POST'])
     def post_message():
         if request.method == 'POST':
-            response = make_response({'status': 200}, 200)
+            response = make_response({'status': 200, 'message_id': 0}, 200)
             return response
         elif request.method == 'GET':
             response = make_response('', 200)

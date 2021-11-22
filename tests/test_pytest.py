@@ -25,3 +25,12 @@ class TestAPIService:
         data = json.loads(r.text)
         # asserting for message_id key in data
         assert "message_id" in data
+
+    def test_post_returns_different_message_id(self):
+        message1 = 'test1'
+        message2 = 'test2'
+        r1 = requests.post('http://localhost:5000', data=message1)
+        r2 = requests.post('http://localhost:5000', data=message2)
+        data1 = json.loads(r1.text)
+        data2 = json.loads(r2.text)
+        assert data1["message_id"] != data2["message_id"]

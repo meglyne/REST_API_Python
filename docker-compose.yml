@@ -4,4 +4,26 @@ services:
     ports:
       - "6379:6379"
     image: "redis:alpine"
-    
+    networks:
+      - backend
+  
+  flask_app-dev:
+    container_name: messaging_api
+    build: 
+      context: .
+      dockerfile: Dockerfile-dev
+    ports:
+      - 5000:5000
+    volumes:
+      - ./:/usr/src/app
+    networks:
+      - backend
+      - frontend
+
+networks:
+  backend:
+    driver: bridge
+    internal: true
+  
+  frontend:
+    driver: bridge

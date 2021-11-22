@@ -1,0 +1,16 @@
+#vscode environment
+.vscode/
+
+#python cache and compiled files
+.pytest_cache/
+__pycache__/
+*.pyc
+
+#python virtual environment
+virtualenv/
+
+#docker related files
+.dockerignore
+Dockerfile*
+Dockerfile.prod
+docker-compose.yml

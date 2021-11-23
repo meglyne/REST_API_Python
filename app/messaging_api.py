@@ -59,15 +59,18 @@ def create_app():
                 #sending back message
                 response = make_response({'status': 200, 'message': '{message}'.format(message=message)}, 200)
             except RedisError:
-                response = make_response({'status': 500, 'message': 'Bad request - There is no message for this id'}, 400)    
+                response = make_response({'status': 400, 'message': 'Bad request - There is no message for this id'}, 400)    
         else:
             response = make_response({'status': 500, 'message': 'Database unavailable - Please try again later.'}, 500)
         return response
 
     return app
 
-def redis_set_value(redis, name, value):
-    success = redis.set(name=name, value=value)
+def redis_set_value(redis, name, value, ttl=None):
+    if ttl is None or ttl > 604800:
+        # set ttl by default to 7 days (=604,800 seconds)
+        ttl = 604800
+    success = redis.set(name=name, value=value,ex=ttl)
     if not success:
         raise RedisError
 

@@ -7,12 +7,12 @@ from redis import Redis, RedisError
 
 from multiprocessing import Value
 from os import environ
+import uuid
 
 import redis
 
 def create_app():
     #Creating a variable shared across Flask processes
-    new_message_id = Value('i', 0)
     app = Flask(__name__)
     hostname = ""
     FLASK_ENV=environ.get('FLASK_ENV')
@@ -30,13 +30,14 @@ def create_app():
                 payload = request.json
                 if 'message' in payload:
                     if redis_connection.ping():
-                        try:
-                            redis_set_value(redis=redis_connection, name=new_message_id.value, value=payload['message'])
-                            with new_message_id.get_lock():
-                                response = make_response({'status': 200, 'message_id': new_message_id.value}, 200)
-                                new_message_id.value +=1
+                        # get a random uuid as message_id
+                        new_message_id = str(uuid.uuid4())
+                        try:    
+                            redis_set_value(redis=redis_connection, name=new_message_id, value=payload['message'])
+                        
+                            response = make_response({'status': 200, 'message_id': new_message_id}, 200)
                         except RedisError:
-                            pass
+                            response = make_response({'status': 500, 'message': 'Database error. Please try again later.'})
                     else:
                         response = make_response({'status': 500, 'message': 'Database unavailable. Please try again later.'}, 500)
                 else:
@@ -48,25 +49,28 @@ def create_app():
         
         return response
     
-    @app.route("/msg/<int:message_id>")
+    @app.route("/msg/<uuid:message_id>")
     def get_message(message_id):
         response = None
         # checking if redis is up
         if redis_connection.ping():
             try:
-                message = redis_get_value(redis=redis_connection, name=message_id)
+                message = redis_get_value(redis=redis_connection, name=str(message_id))
                 #sending back message
                 response = make_response({'status': 200, 'message': '{message}'.format(message=message)}, 200)
             except RedisError:
-                response = make_response({'status': 500, 'message': 'Bad request - There is no message for this id'}, 400)    
+                response = make_response({'status': 400, 'message': 'Bad request - There is no message for this id'}, 400)    
         else:
             response = make_response({'status': 500, 'message': 'Database unavailable - Please try again later.'}, 500)
         return response
 
     return app
 
-def redis_set_value(redis, name, value):
-    success = redis.set(name=name, value=value)
+def redis_set_value(redis, name, value, ttl=None):
+    if ttl is None or ttl > 604800:
+        # set ttl by default to 7 days (=604,800 seconds)
+        ttl = 604800
+    success = redis.set(name=name, value=value,ex=ttl)
     if not success:
         raise RedisError
 

@@ -46,6 +46,19 @@ class TestAPIService:
         # asserting for message_id key in data
         assert "message_id" in data
 
+    def test_message_id_is_not_an_integer(self):
+        payload = {'message': 'test'}
+        r = requests.post('http://localhost:5000', json=payload)
+        data = json.loads(r.text)
+        assert not isinstance(data['message_id'], int)
+
+    def test_message_id_is_not_parsable_as_integer(self):
+        payload = {'message': 'test'}
+        r = requests.post('http://localhost:5000', json=payload)
+        data = json.loads(r.text)
+        message_id = data["message_id"]
+        assert isinstance(message_id, str) and not message_id.isnumeric()
+
     def test_post_returns_different_message_id(self):
         payload1 = {'message':'test1'}
         payload2 = {'message':'test2'}

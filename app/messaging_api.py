@@ -27,12 +27,15 @@ def create_app():
         response = None
         if request.method == 'POST':
             if request.is_json:
-                if redis_connection.ping():
-                    with message_id.get_lock():
-                        response = make_response({'status': 200, 'message_id': message_id.value}, 200)
-                        message_id.value +=1
+                if 'message' in request.json:
+                    if redis_connection.ping():
+                        with message_id.get_lock():
+                            response = make_response({'status': 200, 'message_id': message_id.value}, 200)
+                            message_id.value +=1
+                    else:
+                        response = make_response({'status': 500, 'message': 'Database unavailable. Please try again later.'}, 500)
                 else:
-                    response = make_response({'status': 500, 'message': 'Database unavailable. Please try again later.'}, 500)
+                    response = make_response({'status': 400, 'message': 'Bad request - The JSON payload is missing a "message" key.'}, 400)
             else:
                 response = make_response({'status': 400, 'message': 'Bad request - Your request is missing a JSON payload.'}, 400)
         elif request.method == 'GET':

@@ -51,7 +51,7 @@ def create_app():
     @app.route("/msg/<int:message_id>")
     def get_message(message_id):
         response = None
-        response = make_response('', 200)
+        response = make_response({'status': 200, 'message': ''}, 200)
         return response
 
     return app

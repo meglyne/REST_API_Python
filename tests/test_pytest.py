@@ -91,7 +91,7 @@ class TestAPIService:
         data = json.loads(post_r.text)
         message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
         get_message_r = requests.get(message_link)
-        assert payload['message'] == json.loads(get_message_r.text)
+        assert payload['message'] == json.loads(get_message_r.text)['message']
 
 class TestDatabaseService:
 

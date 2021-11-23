@@ -51,7 +51,16 @@ def create_app():
     @app.route("/msg/<int:message_id>")
     def get_message(message_id):
         response = None
-        response = make_response({'status': 200, 'message': ''}, 200)
+        # checking if redis is up
+        if redis_connection.ping():
+            try:
+                message = redis_get_value(redis=redis_connection, name=message_id)
+                #sending back message
+                response = make_response({'status': 200, 'message': '{message}'.format(message=message)}, 200)
+            except RedisError:
+                response = make_response({'status': 500, 'message': 'Bad request - There is no message for this id'}, 400)    
+        else:
+            response = make_response({'status': 500, 'message': 'Database unavailable - Please try again later.'}, 500)
         return response
 
     return app
@@ -60,3 +69,11 @@ def redis_set_value(redis, name, value):
     success = redis.set(name=name, value=value)
     if not success:
         raise RedisError
+
+def redis_get_value(redis, name):
+    value = redis.get(name=name)
+    if value is None:
+        raise RedisError
+    else:
+        # decoding bytes from redis as string
+        return value.decode("utf-8")

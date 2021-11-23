@@ -12,7 +12,7 @@ import redis
 
 def create_app():
     #Creating a variable shared across Flask processes
-    message_id = Value('i', 0)
+    new_message_id = Value('i', 0)
     app = Flask(__name__)
     hostname = ""
     FLASK_ENV=environ.get('FLASK_ENV')
@@ -27,11 +27,16 @@ def create_app():
         response = None
         if request.method == 'POST':
             if request.is_json:
-                if 'message' in request.json:
+                payload = request.json
+                if 'message' in payload:
                     if redis_connection.ping():
-                        with message_id.get_lock():
-                            response = make_response({'status': 200, 'message_id': message_id.value}, 200)
-                            message_id.value +=1
+                        try:
+                            redis_set_value(redis=redis_connection, name=new_message_id.value, value=payload['message'])
+                            with new_message_id.get_lock():
+                                response = make_response({'status': 200, 'message_id': new_message_id.value}, 200)
+                                new_message_id.value +=1
+                        except RedisError:
+                            pass
                     else:
                         response = make_response({'status': 500, 'message': 'Database unavailable. Please try again later.'}, 500)
                 else:
@@ -42,5 +47,16 @@ def create_app():
             response = make_response('', 200)
         
         return response
+    
+    @app.route("/msg/<int:message_id>")
+    def get_message(message_id):
+        response = None
+        response = make_response('', 200)
+        return response
 
     return app
+
+def redis_set_value(redis, name, value):
+    success = redis.set(name=name, value=value)
+    if not success:
+        raise RedisError

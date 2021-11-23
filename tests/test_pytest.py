@@ -65,7 +65,7 @@ class TestAPIService:
             r = requests.post('http://localhost:5000', json=payload)
             assert r.status_code == 500
 
-    def test_message_posted_is_accessible(self):
+    def test_page_for_message_posted_is_accessible(self):
         payload = {'message':'test'}
         base_url = 'http://localhost:5000'
         post_r = requests.post(base_url, json=payload)

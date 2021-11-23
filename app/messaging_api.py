@@ -34,7 +34,7 @@ def create_app():
                 else:
                     response = make_response({'status': 500, 'message': 'Database unavailable. Please try again later.'}, 500)
             else:
-                response = make_response({'status': 400}, 400)
+                response = make_response({'status': 400, 'message': 'Bad request - Your request is missing a JSON payload.'}, 400)
         elif request.method == 'GET':
             response = make_response('', 200)
         

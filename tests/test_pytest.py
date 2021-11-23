@@ -1,6 +1,6 @@
 # tests/test_pytest.py
 
-from redis import Redis
+from redis import Redis, RedisError
 import requests
 import json
 from os import environ
@@ -48,6 +48,17 @@ class TestAPIService:
         data1 = json.loads(r1.text)
         data2 = json.loads(r2.text)
         assert data1["message_id"] != data2["message_id"]
+
+    def test_api_returns_500_for_post_request_while_redis_unavailable(self):
+        payload = {'message':'test'}
+        try:
+            redis_client = Redis(host='localhost', port=6379, db=0, socket_connect_timeout=2, socket_timeout=2)
+            redis_client.ping()
+            r = requests.post('http://localhost:5000', json=payload)
+            assert r.status_code == 200
+        except RedisError:
+            r = requests.post('http://localhost:5000', json=payload)
+            assert r.status_code == 500
     
     def test_message_posted_is_accessible(self):
         payload = {'message':'test'}

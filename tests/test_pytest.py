@@ -6,6 +6,7 @@ import json
 from os import environ
 
 import pytest
+from requests.api import get
 
 class TestAPIService:
 
@@ -73,6 +74,24 @@ class TestAPIService:
         message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
         get_message_r = requests.get(message_link)
         assert get_message_r.status_code == 200
+
+    def test_page_for_message_posted_has_payload(self):
+        payload = {'message':'test'}
+        base_url = 'http://localhost:5000'
+        post_r = requests.post(base_url, json=payload)
+        data = json.loads(post_r.text)
+        message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
+        get_message_r = requests.get(message_link)
+        assert get_message_r.text != ''
+
+    def test_original_message_posted_is_accessible(self):
+        payload = {'message':'test'}
+        base_url = 'http://localhost:5000'
+        post_r = requests.post(base_url, json=payload)
+        data = json.loads(post_r.text)
+        message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
+        get_message_r = requests.get(message_link)
+        assert payload['message'] == json.loads(get_message_r.text)
 
 class TestDatabaseService:
 

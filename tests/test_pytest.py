@@ -31,6 +31,11 @@ class TestAPIService:
         data = json.loads(r.text)
         assert data["status"] == 200
 
+    def test_api_returns_400_if_payload_does_not_contain_message_key(self):
+        payload = {'whatever': 'test'}
+        r = requests.post('http://localhost:5000', json=payload)
+        assert r.status_code == 400
+
     def test_post_request_returns_message_id(self):
         # Tests that a POST request returns a JSON response with "message_id" as one
         # of its keys
@@ -59,7 +64,7 @@ class TestAPIService:
         except RedisError:
             r = requests.post('http://localhost:5000', json=payload)
             assert r.status_code == 500
-    
+
     def test_message_posted_is_accessible(self):
         payload = {'message':'test'}
         base_url = 'http://localhost:5000'

@@ -72,7 +72,7 @@ def create_app():
         
         return response
     
-    @app.route("/msg/<uuid:message_id>")
+    @app.route("/msg/<uuid:message_id>", methods=['GET'])
     def get_message(message_id):
         response = None
         # checking if redis is up
@@ -107,6 +107,3 @@ def redis_get_value(redis, name):
     else:
         # decoding bytes from redis as string
         return value.decode("utf-8")
-
-if __name__ == '__main__':
-    app.run(debug=True)

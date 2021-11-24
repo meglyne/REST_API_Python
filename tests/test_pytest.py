@@ -1,9 +1,12 @@
 # tests/test_pytest.py
 
+from logging import log
 from redis import Redis, RedisError
 import requests
 import json
 from os import environ
+
+from app.custom_logger import init_logger
 
 import pytest
 from requests.api import get
@@ -70,8 +73,9 @@ class TestAPIService:
 
     def test_api_returns_500_for_post_request_while_redis_unavailable(self):
         payload = {'message':'test'}
+        redis_hostname = get_redis_hostname()
         try:
-            redis_client = Redis(host='localhost', port=6379, db=0, socket_connect_timeout=2, socket_timeout=2)
+            redis_client = Redis(host=redis_hostname, port=6379, db=0, socket_connect_timeout=2, socket_timeout=2)
             redis_client.ping()
             r = requests.post('http://localhost:5000', json=payload)
             assert r.status_code == 200
@@ -110,14 +114,7 @@ class TestDatabaseService:
 
     @pytest.fixture(scope="module")
     def redis_connection(self):
-        hostname = ""
-        FLASK_ENV=environ.get('FLASK_ENV')
-        if FLASK_ENV == "production":
-            hostname = "redis-server"
-        elif FLASK_ENV == "development":
-            hostname = "redis-server-dev"
-        else:
-            hostname = "localhost"
+        hostname = get_redis_hostname()
 
         #using hostname as host to ease connection since ip might be unknown
         r = Redis(host=hostname, port=6379, db=0, socket_connect_timeout=2, socket_timeout=2)
@@ -126,5 +123,31 @@ class TestDatabaseService:
     def test_service_is_available(self, redis_connection):
         print(redis_connection)
         assert redis_connection.ping() == True
+
+class TestLoggerService:
+    def test_logger_level_for_debug_is_debug(self):
+        logger = init_logger(logpath='.', logname='test', env='development')
+        assert logger.level == 10
+
+    def test_logger_level_for_prod_is_info(self):
+        logger = init_logger(logpath='.', logname='test', env='production')
+        assert logger.level == 20
+    
+    def test_logger_with_no_filename_inits(self):
+        logger = init_logger(logpath='.', env='development')
+        assert logger.handlers[-1].baseFilename != ''
+
+def get_redis_hostname():
+    redis_hostname = None
+    FLASK_ENV=environ.get('FLASK_ENV')
+    if FLASK_ENV == "production":
+        redis_hostname = "redis-server"
+    elif FLASK_ENV == "development":
+        redis_hostname = "redis-server-dev"
+    elif FLASK_ENV == "debug":
+        redis_hostname = "localhost"
+    else:
+        redis_hostname = "localhost"
+    return redis_hostname
 
         

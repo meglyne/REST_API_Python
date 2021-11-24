@@ -17,6 +17,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 # prevents Python from buffering stdout and stderr
 ENV PYTHONUNBUFFERED 1
 
+#Adding unpriviledged user
+USER messaging_api
+
 # configure Flask environment variables
 ENV FLASK_APP /usr/src/app/app/messaging_api.py
 ENV FLASK_ENV production

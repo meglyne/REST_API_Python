@@ -17,6 +17,10 @@ class TestAPIService:
         r = requests.get('http://localhost:5000')
         assert r.status_code == 200
 
+    def test_service_is_available_over_https(self):
+        r = requests.get('https://localhost:5000')
+        assert r.status_code == 200
+
     def test_root_address_does_not_accept_put(self):
         r = requests.put('http://localhost:5000')
         # assert api returns 405 Method Not Allowed response

@@ -90,6 +90,20 @@ def create_app():
             response = make_response({'status': 500, 'message': 'Database unavailable - Please try again later.'}, 500)
         return response
 
+    @app.after_request
+    def apply_headers(response):
+        # specifies the content type of the response
+        response.headers.set("Content-Type", "application/json")
+        # protects against drag-and-drop style clickjacking attacks
+        response.headers.set("Content-Security-Policy", "frame-ancestors 'none'")
+        # prevents sensitive information from being cached
+        response.headers.set("Cache-Control", "no-store")
+        # prevents browser from performing MIME sniffing
+        response.headers.set("X-Content-Type-Options", "nosniff")
+        # protects against drag-and-drop style clickjacking attacks
+        response.headers.set("X-Frame-Options", "DENY")
+        return response
+
     return app
 
 def redis_set_value(redis, name, value, ttl=None):

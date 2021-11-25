@@ -1,6 +1,7 @@
 version: "3.9"
 services:
   redis:
+    hostname: "redis-server"
     ports:
       - "6379:6379"
     image: "redis:alpine"
@@ -11,11 +12,12 @@ services:
     container_name: messaging_api
     build: 
       context: .
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
     ports:
       - 5000:5000
     volumes:
       - ./:/usr/src/app
+      - /var/log/messaging_api
     networks:
       - backend
       - frontend

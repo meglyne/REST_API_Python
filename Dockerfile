@@ -22,7 +22,7 @@ USER messaging_api
 
 # configure Flask environment variables
 ENV FLASK_APP /usr/src/app/app/messaging_api.py
-ENV FLASK_ENV development
+ENV FLASK_ENV production
 
 # running flask server
 CMD flask run --host=0.0.0.0

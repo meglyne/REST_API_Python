@@ -1,6 +1,15 @@
 # pull base image
 FROM python:3.8-alpine
 
+# adding unpriviledged user and group
+RUN addgroup -S messaging_api -g 433 && \
+    adduser -u 431 -s /bin/sh -G messaging_api -D messaging_api
+
+# Giving ownership of logs to messaging_api user
+RUN mkdir /var/log/messaging_api
+RUN chown messaging_api:messaging_api /var/log/messaging_api
+
+
 #set working directory
 WORKDIR /usr/src/app
 

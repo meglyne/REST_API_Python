@@ -17,6 +17,15 @@ class TestAPIService:
         r = requests.get('http://localhost:5000')
         assert r.status_code == 200
 
+    def test_service_is_available_over_https(self):
+        r = requests.get('https://localhost:5000')
+        assert r.status_code == 200
+
+    def test_root_address_does_not_accept_put(self):
+        r = requests.put('http://localhost:5000')
+        # assert api returns 405 Method Not Allowed response
+        assert r.status_code == 405
+
     def test_post_request_with_json_returns_code_200(self):
         payload = {'message': 'test'}
         r = requests.post('http://localhost:5000', json=payload)
@@ -91,6 +100,16 @@ class TestAPIService:
         message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
         get_message_r = requests.get(message_link)
         assert get_message_r.status_code == 200
+
+    def test_msg_address_does_not_accept_post(self):
+        payload = {'message':'test'}
+        base_url = 'http://localhost:5000'
+        post_r = requests.post(base_url, json=payload)
+        data = json.loads(post_r.text)
+        message_link = '{base_url}/msg/{message_id}'.format(base_url=base_url, message_id=data["message_id"])
+        post_message_r = requests.post(message_link, json=payload)
+        # assert api returns 405 Method Not Allowed response
+        assert post_message_r.status_code == 405
 
     def test_page_for_message_posted_has_payload(self):
         payload = {'message':'test'}

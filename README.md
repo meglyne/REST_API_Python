@@ -30,14 +30,14 @@ foo@bar:messaging_api$ pip3 install -r requirements.txt
 Export environment variables for Flask (replace `development` with `production` for production environment)
 
 ```console
-foo@bar:messaging_api$export FLASK_APP=app/messaging_api.py
-foo@bar:messaging_api$export FLASK_ENV=development
+foo@bar:messaging_api$ export FLASK_APP=app/messaging_api.py
+foo@bar:messaging_api$ export FLASK_ENV=development
 ```
 
 Run the application
 
 ```console
-foo@bar:messaging_api$flask run
+foo@bar:messaging_api$ flask run
 [...]
 ```
 
@@ -50,14 +50,14 @@ foo@bar:messaging_api$flask run
 Run the following command to build the docker images for the API and Redis and launch their associated container in detached mode:
 
 ```console
-foo@bar:messaging_api$docker-compose -f docker-compose.dev.yml up -d
+foo@bar:messaging_api$ docker-compose -f docker-compose.dev.yml up -d
 ```
 
 ## Running tests
 
 Launch the Flask and Redis server and run the following command
 ```console
-foo@bar:messaging_api$pytest tests/test_pytest.py
+foo@bar:messaging_api$ pytest tests/test_pytest.py
 ```
 
 ## Security risks and considerations regarding the API

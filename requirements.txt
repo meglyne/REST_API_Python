@@ -1,0 +1,9 @@
+# API and related packages
+flask
+
+#Database and related packages
+redis
+
+# for testing purposes
+pytest
+requests

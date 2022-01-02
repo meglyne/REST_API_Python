@@ -1,1 +1,25 @@
 
+stages:
+  - before_script
+  - test
+  - deploy
+
+image: "python:3.8-alpine"
+
+cache:
+  paths:
+    - venv/
+
+setup:
+  stage: before_script
+  script:
+    - python --version # For debugging
+    - pip install virtualenv
+    - virtualenv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+
+run_functional_tests:
+  stage: test
+  script:
+    - pytest tests/test_pytest

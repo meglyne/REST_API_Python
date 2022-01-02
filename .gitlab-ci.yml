@@ -12,6 +12,8 @@ cache:
 
 setup:
   stage: before_script
+  tags:
+    - python 3.8
   script:
     - python --version # For debugging
     - pip install virtualenv

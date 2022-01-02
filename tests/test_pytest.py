@@ -17,6 +17,10 @@ class TestAPIService:
         r = requests.get('https://localhost:5000', verify="app/instance/localhost.crt")
         assert r.status_code == 200
 
+    def test_service_forces_https_use(self):
+        r = requests.get('http://localhost:5000')
+        assert r.status_code == 104
+
     def test_service_is_available_over_https(self):
         r = requests.get('https://localhost:5000', verify="app/instance/localhost.crt")
         assert r.status_code == 200
